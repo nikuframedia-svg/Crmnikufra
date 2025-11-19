@@ -11,11 +11,10 @@ type Task = {
 };
 
 const collaborators = [
-  { id: '1', name: 'João Silva', color: 'bg-blue-500' },
-  { id: '2', name: 'Maria Costa', color: 'bg-green-500' },
-  { id: '3', name: 'Pedro Santos', color: 'bg-purple-500' },
-  { id: '4', name: 'Ana Oliveira', color: 'bg-orange-500' },
-  { id: '5', name: 'Carlos Pereira', color: 'bg-pink-500' },
+  { id: '1', name: 'JOAO MILHAZES', color: 'bg-blue-500' },
+  { id: '2', name: 'LUIS NICOLAU', color: 'bg-green-500' },
+  { id: '3', name: 'AFONSO MILHEIRO', color: 'bg-purple-500' },
+  { id: '4', name: 'MATEUS SILVA', color: 'bg-orange-500' },
 ];
 
 const getDaysInMonth = (date: Date) => {
