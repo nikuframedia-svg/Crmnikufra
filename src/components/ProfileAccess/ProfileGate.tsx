@@ -64,17 +64,23 @@ export default function ProfileGate() {
 
         {selectedId && (
           <form onSubmit={handleSubmit} className="bg-slate-50 border border-slate-200 rounded-xl p-4">
-            <label className="text-xs uppercase tracking-wide text-slate-500 flex items-center gap-2 mb-2">
+            <label
+              htmlFor="profile-password"
+              className="text-xs uppercase tracking-wide text-slate-500 flex items-center gap-2 mb-2"
+            >
               <Lock className="w-4 h-4" />
               Introduz a senha de acesso
             </label>
             <div className="flex space-x-3">
               <input
                 type="password"
+                id="profile-password"
+                name="profile-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="••••••••"
+                autoComplete="current-password"
                 required
               />
               <button
