@@ -15,6 +15,14 @@ const getDaysInMonth = (date: Date) => {
   return { daysInMonth, startingDayOfWeek, year, month };
 };
 
+const COLOR_HEX_MAP: Record<string, string> = {
+  'bg-blue-600': '#2563eb',
+  'bg-green-600': '#16a34a',
+  'bg-purple-600': '#9333ea',
+  'bg-orange-600': '#ea580c',
+  'bg-red-500': '#ef4444',
+};
+
 export default function CalendarView() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedCollaborator, setSelectedCollaborator] = useState<string | null>(null);
@@ -30,6 +38,7 @@ export default function CalendarView() {
     start_time: '',
     end_time: '',
     assignee_profile_id: '',
+    assignee_profile_ids: [] as string[],
   });
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
 
@@ -54,17 +63,50 @@ export default function CalendarView() {
     setCurrentDate(new Date(year, month + 1, 1));
   };
 
+  const getCollaboratorColorHex = (collaboratorId: string) => {
+    const collab = collaborators.find((c) => c.id === collaboratorId);
+    if (!collab) return '#475569';
+    return COLOR_HEX_MAP[collab.color] || '#475569';
+  };
+
+  const getTaskBackgroundStyle = (assigneeIds: string[]) => {
+    if (assigneeIds.length <= 1) {
+      const colorHex = assigneeIds.length === 1 ? getCollaboratorColorHex(assigneeIds[0]) : '#475569';
+      return { backgroundColor: colorHex };
+    }
+
+    const segments = assigneeIds.map((id, index) => {
+      const start = (index / assigneeIds.length) * 100;
+      const end = ((index + 1) / assigneeIds.length) * 100;
+      return `${getCollaboratorColorHex(id)} ${start}% ${end}%`;
+    });
+
+    return {
+      backgroundImage: `linear-gradient(90deg, ${segments.join(', ')})`,
+    };
+  };
+
   const getTasksForDay = (day: number) => {
     const dayDate = new Date(year, month, day);
     return tasks.filter((task) => {
       const taskDateStr = task.due_date || task.date;
       if (!taskDateStr) return false;
       const taskDate = new Date(taskDateStr);
+      const assigneeIds =
+        task.assignee_profile_ids && task.assignee_profile_ids.length > 0
+          ? task.assignee_profile_ids
+          : task.assignee_profile_id
+            ? [task.assignee_profile_id]
+            : task.assigned_to
+              ? [task.assigned_to]
+              : [];
       return (
         taskDate.getDate() === day &&
         taskDate.getMonth() === month &&
         taskDate.getFullYear() === year &&
-        (!selectedCollaborator || task.assignee_profile_id === selectedCollaborator || task.assigned_to === selectedCollaborator)
+        (!selectedCollaborator ||
+          assigneeIds.includes(selectedCollaborator) ||
+          task.assigned_to === selectedCollaborator)
       );
     });
   };
@@ -89,7 +131,8 @@ export default function CalendarView() {
         date: formData.date || undefined, // useTasks will map this to due_date
         start_time: formData.start_time || undefined,
         end_time: formData.end_time || undefined,
-        assignee_profile_id: formData.assignee_profile_id || undefined,
+        assignee_profile_id: formData.assignee_profile_ids[0] || formData.assignee_profile_id || undefined,
+        assignee_profile_ids: formData.assignee_profile_ids,
       });
       setShowModal(false);
       setFormData({
@@ -101,6 +144,7 @@ export default function CalendarView() {
         start_time: '',
         end_time: '',
         assignee_profile_id: '',
+        assignee_profile_ids: [],
       });
     } catch (error) {
       console.error('Error creating task:', error);
@@ -108,9 +152,18 @@ export default function CalendarView() {
     }
   };
 
-  const getCollaboratorColor = (collaboratorId: string) => {
-    const collab = collaborators.find((c) => c.id === collaboratorId);
-    return collab?.color || 'bg-gray-500';
+  const toggleAssignee = (collaboratorId: string) => {
+    setFormData((prev) => {
+      const exists = prev.assignee_profile_ids.includes(collaboratorId);
+      const next = exists
+        ? prev.assignee_profile_ids.filter((id) => id !== collaboratorId)
+        : [...prev.assignee_profile_ids, collaboratorId];
+      return {
+        ...prev,
+        assignee_profile_ids: next,
+        assignee_profile_id: next[0] || '',
+      };
+    });
   };
 
   const handleDeleteTask = async (taskId: string, title: string) => {
@@ -152,13 +205,20 @@ export default function CalendarView() {
         </div>
         <div className="space-y-1">
           {dayTasks.map((task) => {
-            const assigneeId = task.assignee_profile_id || task.assigned_to;
-            const color = assigneeId ? getCollaboratorColor(assigneeId) : 'bg-gray-500';
+            const assigneeIds =
+              task.assignee_profile_ids && task.assignee_profile_ids.length > 0
+                ? task.assignee_profile_ids
+                : task.assignee_profile_id
+                  ? [task.assignee_profile_id]
+                  : task.assigned_to
+                    ? [task.assigned_to]
+                    : [];
             const timeDisplay = task.start_time ? `${task.start_time} ` : '';
             return (
               <div
                 key={task.id}
-                className={`${color} text-white text-xs px-2 py-1 rounded flex items-center justify-between gap-2`}
+                className="text-white text-xs px-2 py-1 rounded flex items-center justify-between gap-2"
+                style={getTaskBackgroundStyle(assigneeIds)}
                 title={`${task.title}${task.start_time ? ` - ${task.start_time}` : ''}`}
               >
                 <span className="truncate">
@@ -418,19 +478,22 @@ export default function CalendarView() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-dark-300 mb-1">Atribuir a</label>
-                <select
-                  value={formData.assignee_profile_id}
-                  onChange={(e) => setFormData({ ...formData, assignee_profile_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-800 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-dark-900 text-gray-900 dark:text-white"
-                >
-                  <option value="">Nenhum</option>
+                <label className="block text-sm font-medium text-gray-700 dark:text-dark-300 mb-2">Atribuir a</label>
+                <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-200 dark:border-dark-800 rounded-lg p-3">
                   {collaborators.map((collab) => (
-                    <option key={collab.id} value={collab.id}>
-                      {collab.name}
-                    </option>
+                    <label key={collab.id} className="flex items-center space-x-3 text-sm text-gray-700 dark:text-dark-200">
+                      <input
+                        type="checkbox"
+                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                        checked={formData.assignee_profile_ids.includes(collab.id)}
+                        onChange={() => toggleAssignee(collab.id)}
+                      />
+                      <span>{collab.name}</span>
+                    </label>
                   ))}
-                </select>
+                  {collaborators.length === 0 && <p className="text-sm text-gray-500">Sem colaboradores disponíveis.</p>}
+                </div>
+                <p className="text-xs text-gray-500 dark:text-dark-400 mt-1">Podes selecionar vários responsáveis.</p>
               </div>
 
               <div className="flex space-x-3 pt-4">

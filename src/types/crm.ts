@@ -145,6 +145,7 @@ export interface Task {
   project_id?: UUID;
   lead_id?: UUID;
   assignee_profile_id?: UUID;
+  assignee_profile_ids?: UUID[];
   date?: string; // YYYY-MM-DD (for calendar view)
   start_time?: string; // HH:MM
   end_time?: string;

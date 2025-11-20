@@ -20,7 +20,8 @@ export function useTasks() {
       }
 
       if (filters?.assignee_profile_id) {
-        query = query.eq('assigned_to', filters.assignee_profile_id);
+        const id = filters.assignee_profile_id;
+        query = query.or(`assigned_to.eq.${id},assignee_profile_ids.cs.{${id}}`);
       }
 
       const { data, error: fetchError } = await query.order('due_date', { ascending: true });
@@ -50,6 +51,12 @@ export function useTasks() {
           project_id: task.project_id,
           lead_id: task.lead_id,
           assigned_to: task.assignee_profile_id,
+          assignee_profile_ids:
+            task.assignee_profile_ids && task.assignee_profile_ids.length > 0
+              ? task.assignee_profile_ids
+              : task.assignee_profile_id
+                ? [task.assignee_profile_id]
+                : null,
           due_date: task.date ? new Date(task.date).toISOString() : null,
           created_by: userId,
         })
