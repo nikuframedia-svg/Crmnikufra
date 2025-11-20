@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { getStoredProfileId } from './profileAccessStorage';
 
 const DEFAULT_SUPABASE_URL = 'https://qkotmsdonlglwtrlqfja.supabase.co';
 const DEFAULT_SUPABASE_ANON_KEY =
@@ -16,7 +17,20 @@ if (
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  global: {
+    fetch: (url: string, options?: RequestInit) => {
+      const headers = new Headers(options?.headers ?? {});
+      if (typeof window !== 'undefined') {
+        const profileId = getStoredProfileId();
+        if (profileId) {
+          headers.set('x-nikufra-profile-id', profileId);
+        }
+      }
+      return fetch(url, { ...options, headers });
+    },
+  },
+});
 
 export type Profile = {
   id: string;
