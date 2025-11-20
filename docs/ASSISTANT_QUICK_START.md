@@ -68,3 +68,4 @@ E fornece:
 
 O Assistente Nikufra está configurado e pronto para usar!
 
+

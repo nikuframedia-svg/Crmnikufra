@@ -165,3 +165,4 @@ Depois de executar os SQLs, verifica:
 
 As migrations estão aplicadas! Podes continuar a usar a aplicação normalmente. O problema do CLI pode ser resolvido depois quando necessário.
 
+

@@ -114,3 +114,4 @@ Partilha:
 2. O output do terminal onde corre `npm run dev`
 3. O conteúdo do `.env` (sem mostrar as chaves completas)
 
+

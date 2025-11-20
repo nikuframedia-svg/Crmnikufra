@@ -331,3 +331,4 @@ O sistema de automações configurável está **100% funcional**!
 - Adicionar mais tipos de actions
 - Suporte para condições mais complexas
 
+

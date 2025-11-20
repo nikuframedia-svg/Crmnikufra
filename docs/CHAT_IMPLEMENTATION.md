@@ -216,3 +216,4 @@ O sistema de chat colaborativo v1 está **100% funcional** e pronto para uso!
 - Considerar adicionar threads/menções no futuro
 - Considerar canais privados quando necessário
 
+

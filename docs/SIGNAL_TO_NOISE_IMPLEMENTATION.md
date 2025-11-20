@@ -154,3 +154,4 @@ Edita `src/hooks/useSignalToNoiseForUser.ts`:
 - ✅ Tipos TypeScript corretos
 - ✅ Interface visual criada
 
+

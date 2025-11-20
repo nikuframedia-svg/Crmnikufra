@@ -51,3 +51,4 @@ timeout 15 npx supabase migration list 2>&1 || {
     esac
 }
 
+

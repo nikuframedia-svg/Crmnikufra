@@ -84,3 +84,4 @@ VITE_OPENAI_API_KEY=sk-proj-...
 Depois de iniciar, abre o browser em:
 **http://localhost:5173/**
 
+

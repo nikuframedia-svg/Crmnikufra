@@ -284,3 +284,4 @@ ORDER BY ar.name;
 
 Agora podes criar e gerir automações diretamente na base de dados, sem precisar de alterar código!
 
+

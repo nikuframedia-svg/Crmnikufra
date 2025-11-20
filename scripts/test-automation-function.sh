@@ -65,3 +65,4 @@ else
     echo "3. Check function logs: npx supabase functions logs run-automations"
 fi
 
+

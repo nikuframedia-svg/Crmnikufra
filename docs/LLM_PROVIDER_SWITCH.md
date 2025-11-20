@@ -170,3 +170,4 @@ VITE_OLLAMA_MODEL=llama2
 - [ ] Testar com API key válida
 - [ ] Documentar variáveis de ambiente necessárias
 
+

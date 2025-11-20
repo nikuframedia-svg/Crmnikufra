@@ -75,3 +75,4 @@ Isto mostra quais migrations estão aplicadas localmente vs remotamente.
 - `reverted` - Migration foi revertida/removida
 - `superseded` - Migration foi substituída por outra
 
+

@@ -107,3 +107,4 @@ INSERT INTO leads ...;
 2. Para SQL: usa Supabase Dashboard ou pede-me para executar
 3. Para scripts: certifica-te que estás no diretório do projeto
 
+

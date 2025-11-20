@@ -98,3 +98,4 @@ Deves ver `run-automations` na lista.
 - ✅ Verifica que a função está deployada: `npx supabase functions list`
 - ✅ Faz deploy novamente: `npx supabase functions deploy run-automations`
 
+

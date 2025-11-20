@@ -84,3 +84,4 @@ Se o comando continuar a travar, pode ser um problema de conexão:
    - Vai a Supabase Dashboard > Database > Migrations
    - Vê o estado visualmente lá
 
+

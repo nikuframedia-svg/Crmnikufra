@@ -7,3 +7,4 @@ cd "$(dirname "$0")/.." || exit 1
 # Usa npx diretamente para evitar aliases
 npx supabase functions deploy run-automations "$@"
 
+

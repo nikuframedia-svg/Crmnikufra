@@ -67,3 +67,4 @@ O Supabase CLI continua com problemas de login, mas **não é crítico** porque:
 Para resolver o CLI no futuro:
 - Ver `docs/FIX_SUPABASE_LOGIN.md`
 
+

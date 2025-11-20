@@ -18,3 +18,4 @@ This repository currently runs in a dev-friendly mode (anonymous Supabase access
 
 Track these tasks in the backlog so the CRM can move from prototype mode to a hardened production tier. Let me know when you're ready to implement each step and I'll help wire it up.***
 
+

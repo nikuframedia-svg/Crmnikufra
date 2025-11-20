@@ -115,3 +115,4 @@ npm run automations
 
 **Sistema 100% funcional e pronto para criar novas regras via BD!**
 
+

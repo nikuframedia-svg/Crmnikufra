@@ -154,3 +154,4 @@ Este script:
 | **Edge Function + Webhooks** | Eventos específicos | Reativo, executa apenas quando necessário |
 | **Script Node.js + Cron** | Desenvolvimento ou se preferires controlo total | Mais controlo, fácil debug local |
 
+

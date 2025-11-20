@@ -42,3 +42,4 @@ echo "💡 Dica: Para verificar se há dados que correspondem às condições:"
 echo "   - Leads 'contacted' com owner: SELECT * FROM leads WHERE stage = 'contacted' AND owner_id IS NOT NULL;"
 echo "   - Projetos 'active': SELECT * FROM projects WHERE status = 'active';"
 
+
