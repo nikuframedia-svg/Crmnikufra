@@ -22,10 +22,6 @@ export default function CRMView() {
             <Upload className="w-4 h-4" />
             <span>Importar CSV</span>
           </button>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-lg">
-            <Plus className="w-4 h-4" />
-            <span>Novo {activeTab === 'contacts' ? 'Contacto' : activeTab === 'companies' ? 'Empresa' : 'Lead'}</span>
-          </button>
         </div>
       </div>
 

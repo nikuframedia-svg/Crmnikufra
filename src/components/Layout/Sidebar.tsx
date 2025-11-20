@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Briefcase, FileText, Calendar, BarChart3, Moon, Sun } from 'lucide-react';
+import { LayoutDashboard, Users, Briefcase, FileText, Calendar, BarChart3, Moon, Sun, CalendarCheck, Settings, MessageSquare } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 
 type MenuItem = {
@@ -9,11 +9,14 @@ type MenuItem = {
 
 const menuItems: MenuItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'today', label: 'Minha Agenda', icon: CalendarCheck },
   { id: 'crm', label: 'CRM & Vendas', icon: Users },
   { id: 'projects', label: 'Projetos', icon: Briefcase },
   { id: 'documents', label: 'Documentação', icon: FileText },
   { id: 'calendar', label: 'Calendário', icon: Calendar },
+  { id: 'chat', label: 'Chat Colaborativo', icon: MessageSquare },
   { id: 'performance', label: 'Performance', icon: BarChart3 },
+  { id: 'settings', label: 'Configurações', icon: Settings },
 ];
 
 type SidebarProps = {

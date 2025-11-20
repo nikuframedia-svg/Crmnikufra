@@ -1,0 +1,31 @@
+{
+  "tasks": [
+    {
+      "id": "1",
+      "title": "Update Collaborator Names",
+      "description": "Update the hardcoded collaborator names in the frontend code to reflect the Nikufra team.",
+      "status": "done",
+      "priority": "high",
+      "dependencies": [],
+      "subtasks": []
+    },
+    {
+      "id": "2",
+      "title": "Sync Code to Repository",
+      "description": "Push local changes to the GitHub repository so they are reflected in Bolt.",
+      "status": "pending",
+      "priority": "high",
+      "dependencies": ["1"],
+      "subtasks": []
+    },
+    {
+      "id": "3",
+      "title": "Integrate Supabase Profiles",
+      "description": "Refactor the frontend to fetch user profiles from Supabase instead of using hardcoded data.",
+      "status": "pending",
+      "priority": "medium",
+      "dependencies": ["2"],
+      "subtasks": []
+    }
+  ]
+}

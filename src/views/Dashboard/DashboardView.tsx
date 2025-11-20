@@ -1,72 +1,76 @@
-import { useEffect, useState } from 'react';
-import { Users, TrendingUp, Briefcase, CheckCircle, Calendar, FileText, ArrowUp, ArrowDown } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
-
-type Stats = {
-  totalContacts: number;
-  totalLeads: number;
-  totalProjects: number;
-  totalTasks: number;
-  completedTasks: number;
-  upcomingEvents: number;
-  totalDocuments: number;
-};
+import { useState } from 'react';
+import {
+  Users,
+  TrendingUp,
+  Briefcase,
+  CheckCircle,
+  Calendar,
+  FileText,
+  ArrowUp,
+  ArrowDown,
+  AlertTriangle,
+  Sparkles,
+  Send,
+  Upload,
+  Loader2,
+} from 'lucide-react';
+import { useDashboardMetrics } from '../../hooks/useDashboardMetrics';
+import { useDocuments } from '../../hooks/useDocuments';
+import { callLLM } from '../../lib/llmClient';
 
 export default function DashboardView() {
-  const [stats, setStats] = useState<Stats>({
-    totalContacts: 0,
-    totalLeads: 0,
-    totalProjects: 0,
-    totalTasks: 0,
-    completedTasks: 0,
-    upcomingEvents: 0,
-    totalDocuments: 0,
-  });
-  const [loading, setLoading] = useState(true);
+  const { metrics, loading } = useDashboardMetrics();
+  const { documents } = useDocuments();
 
-  useEffect(() => {
-    loadDashboardStats();
-  }, []);
+  const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
+  const [chatInput, setChatInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatError, setChatError] = useState<string | null>(null);
+  const llmSuggestions = [
+    'Resumo rápido da performance desta semana',
+    'Quais são os sinais de risco que devo atacar hoje?',
+    'Ajuda-me a priorizar leads e projetos mais críticos',
+    'Sugere ações para melhorar conversão no funil',
+  ];
 
-  const loadDashboardStats = async () => {
-    try {
-      const [
-        { count: contactsCount },
-        { count: leadsCount },
-        { count: projectsCount },
-        { count: tasksCount },
-        { count: completedTasksCount },
-        { count: eventsCount },
-        { count: documentsCount },
-      ] = await Promise.all([
-        supabase.from('contacts').select('*', { count: 'exact', head: true }),
-        supabase.from('leads').select('*', { count: 'exact', head: true }),
-        supabase.from('projects').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-        supabase.from('tasks').select('*', { count: 'exact', head: true }),
-        supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('status', 'done'),
-        supabase.from('calendar_events').select('*', { count: 'exact', head: true }).gte('start_time', new Date().toISOString()),
-        supabase.from('documents').select('*', { count: 'exact', head: true }),
-      ]);
+  const buildDashboardContext = (extraContext?: string) => {
+    const base = `Contexto das métricas atuais:
+- Total contactos: ${metrics.totalContacts}
+- Leads ativas: ${metrics.activeLeads}
+- Projetos ativos: ${metrics.activeProjects}
+- Tarefas pendentes: ${metrics.pendingTasks}
+- Eventos futuros: ${metrics.upcomingEvents}
+- Documentos: ${metrics.documentsCount}
+- Leads em risco: ${metrics.staleLeadsCount}
+- Projetos em risco: ${metrics.staleProjectsCount}
 
-      setStats({
-        totalContacts: contactsCount || 0,
-        totalLeads: leadsCount || 0,
-        totalProjects: projectsCount || 0,
-        totalTasks: tasksCount || 0,
-        completedTasks: completedTasksCount || 0,
-        upcomingEvents: eventsCount || 0,
-        totalDocuments: documentsCount || 0,
-      });
-    } catch (error) {
-      console.error('Error loading dashboard stats:', error);
-    } finally {
-      setLoading(false);
-    }
+Usa este contexto para responder em português com foco executivo.`;
+    return extraContext ? `${base}\n\nContexto adicional:\n${extraContext}` : base;
   };
 
-  const taskCompletionRate = stats.totalTasks > 0
-    ? ((stats.completedTasks / stats.totalTasks) * 100).toFixed(1)
-    : 0;
+  const handleSendChat = async (prompt?: string, extraContext?: string) => {
+    const message = prompt ?? chatInput.trim();
+    if (!message || chatLoading) return;
+
+    setChatError(null);
+    setChatInput('');
+    setChatMessages((prev) => [...prev, { role: 'user', content: message }]);
+    setChatLoading(true);
+    try {
+      const response = await callLLM(`${buildDashboardContext(extraContext)}\n\nPergunta: ${message}`);
+      if (response.error) {
+        setChatError(response.error);
+        setChatMessages((prev) => prev.slice(0, -1));
+        return;
+      }
+      setChatMessages((prev) => [...prev, { role: 'assistant', content: response.content }]);
+    } catch (err: any) {
+      setChatError(err.message || 'Erro ao falar com o assistente.');
+      setChatMessages((prev) => prev.slice(0, -1));
+    } finally {
+      setChatLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -86,6 +90,108 @@ export default function DashboardView() {
         <p className="text-gray-600 dark:text-dark-300 mt-1">Visão geral de métricas e indicadores de performance</p>
       </div>
 
+      <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
+        <div className="space-y-5">
+          <div>
+            <div className="flex items-center gap-2 text-sm uppercase tracking-wide opacity-80">
+              <Sparkles className="w-4 h-4" />
+              Assistente Nikufra
+            </div>
+            <h3 className="text-2xl font-bold mt-1">Fala com o Assistente diretamente do Dashboard</h3>
+            <p className="text-white/80">
+              Usa o chat expandido para perguntas abertas, dispara sugestões rápidas ou envia documentos para ter respostas
+              com contexto executivo imediato.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <div className="bg-white/5 rounded-xl p-4 space-y-4">
+              <div>
+                <label className="text-xs uppercase tracking-wide opacity-80 block mb-2">Sugestões rápidas</label>
+                <div className="flex flex-wrap gap-2">
+                  {llmSuggestions.map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      onClick={() => handleSendChat(suggestion)}
+                      className="text-xs bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-full transition"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs uppercase tracking-wide opacity-80 block mb-2">Documentos rápidos</label>
+                <div className="flex flex-wrap gap-2">
+                  {documents.slice(0, 8).map((doc) => (
+                    <button
+                      key={doc.id}
+                      onClick={() =>
+                        handleSendChat(
+                          `Analisa o documento "${doc.title}" e partilha insights aplicáveis para o executivo.`,
+                          `Documento selecionado: ${doc.title} (${doc.description ?? 'sem descrição'})`
+                        )
+                      }
+                      className="text-xs bg-white/15 hover:bg-white/30 text-white px-3 py-1 rounded-full transition inline-flex items-center gap-1"
+                    >
+                      <Upload className="w-3 h-3" />
+                      {doc.title}
+                    </button>
+                  ))}
+                  {documents.length === 0 && <p className="text-xs text-white/70">Ainda não existem documentos.</p>}
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white/5 rounded-xl p-4 flex flex-col">
+              <label className="text-xs uppercase tracking-wide opacity-80 block mb-2">Chat com o Assistente</label>
+              <div className="flex-1 min-h-[320px] max-h-[520px] overflow-y-auto space-y-3 pr-1 bg-white/10 rounded-lg p-3">
+                {chatMessages.length === 0 && (
+                  <p className="text-sm text-white/70">
+                    Ainda não fizeste perguntas. Usa as sugestões, seleciona um documento ou escreve a tua questão para obter
+                    um insight imediato.
+                  </p>
+                )}
+                {chatMessages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`text-sm px-3 py-2 rounded-lg leading-relaxed ${
+                      msg.role === 'user' ? 'bg-white/30 text-white' : 'bg-white text-purple-700'
+                    }`}
+                  >
+                    {msg.content}
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-end gap-2 mt-3">
+                <textarea
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendChat();
+                    }
+                  }}
+                  placeholder="Escreve a tua pergunta..."
+                  rows={chatInput.length > 140 ? 4 : 3}
+                  className="flex-1 text-sm text-purple-900 rounded-lg px-3 py-2 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white bg-white text-left"
+                />
+                <button
+                  onClick={() => handleSendChat()}
+                  disabled={!chatInput.trim() || chatLoading}
+                  className="p-3 bg-white text-purple-700 rounded-lg hover:bg-purple-50 disabled:opacity-50 flex items-center justify-center min-w-[48px] min-h-[48px]"
+                >
+                  {chatLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                </button>
+              </div>
+              {chatError && <p className="text-xs text-red-200 mt-2">{chatError}</p>}
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition">
           <div className="flex items-start justify-between mb-4">
@@ -98,7 +204,7 @@ export default function DashboardView() {
             </span>
           </div>
           <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">Total Contactos</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalContacts}</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.totalContacts}</p>
         </div>
 
         <div className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition">
@@ -112,7 +218,7 @@ export default function DashboardView() {
             </span>
           </div>
           <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">Leads Ativos</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalLeads}</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.activeLeads}</p>
         </div>
 
         <div className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition">
@@ -126,7 +232,7 @@ export default function DashboardView() {
             </span>
           </div>
           <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">Projetos Ativos</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalProjects}</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.activeProjects}</p>
         </div>
 
         <div className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition">
@@ -139,11 +245,8 @@ export default function DashboardView() {
               3%
             </span>
           </div>
-          <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">Tarefas</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalTasks}</p>
-          <p className="text-xs text-gray-500 dark:text-dark-400 mt-2">
-            {stats.completedTasks} concluídas ({taskCompletionRate}%)
-          </p>
+          <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">Tarefas Pendentes</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.pendingTasks}</p>
         </div>
 
         <div className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition">
@@ -157,7 +260,7 @@ export default function DashboardView() {
             </span>
           </div>
           <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">Próximos Eventos</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.upcomingEvents}</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.upcomingEvents}</p>
         </div>
 
         <div className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition">
@@ -170,7 +273,44 @@ export default function DashboardView() {
             </span>
           </div>
           <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">Documentos</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalDocuments}</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.documentsCount}</p>
+        </div>
+
+        {/* Risk Indicators */}
+        <div className="bg-white dark:bg-dark-900 rounded-xl border border-yellow-200 dark:border-yellow-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer">
+          <div className="flex items-start justify-between mb-4">
+            <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
+              <AlertTriangle className="w-6 h-6 text-yellow-700 dark:text-yellow-500" />
+            </div>
+            {metrics.staleLeadsCount > 0 && (
+              <span className="flex items-center text-sm text-yellow-600 dark:text-yellow-500 font-medium">
+                Atenção
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">Leads em Risco</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.staleLeadsCount}</p>
+          <p className="text-xs text-gray-500 dark:text-dark-400 mt-1">
+            Sem atividade há mais de 7 dias
+          </p>
+        </div>
+
+        <div className="bg-white dark:bg-dark-900 rounded-xl border border-orange-200 dark:border-orange-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer">
+          <div className="flex items-start justify-between mb-4">
+            <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+              <AlertTriangle className="w-6 h-6 text-orange-700 dark:text-orange-500" />
+            </div>
+            {metrics.staleProjectsCount > 0 && (
+              <span className="flex items-center text-sm text-orange-600 dark:text-orange-500 font-medium">
+                Atenção
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">Projetos em Risco</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.staleProjectsCount}</p>
+          <p className="text-xs text-gray-500 dark:text-dark-400 mt-1">
+            Sem tarefas recentes há mais de 14 dias
+          </p>
         </div>
       </div>
 

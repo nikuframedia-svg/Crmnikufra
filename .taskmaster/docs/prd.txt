@@ -1,0 +1,51 @@
+# CRM Nikufra PRD
+
+## Project Overview
+CRM Nikufra is a comprehensive Customer Relationship Management system and Work OS designed for Nikufra. It includes features for managing contacts, leads, calendar events, tasks, projects, documents, and team collaboration. The system is built using React (Vite) for the frontend and Supabase for the backend.
+
+## Goals
+1.  **Customize Frontend**: Update the UI to reflect Nikufra's branding and team structure.
+    *   ✅ Completed: Collaborator names updated to "JOAO MILHAZES", "LUIS NICOLAU", "AFONSO MILHEIRO", "MATEUS SILVA".
+2.  **Integrate Supabase**: Connect the frontend to the Supabase backend for dynamic data loading.
+    *   ✅ Completed: All views integrated with Supabase (profiles, leads, contacts, companies, projects, tasks, documents, activities, notes, notifications, settings, chat).
+3.  **Context and History System**: Implement context and history tracking for all entities.
+    *   ✅ Completed: Timeline of activities, internal notes, detail pages for leads, contacts, companies, and projects.
+4.  **Notification System**: Internal notification system with bell icon in header.
+    *   ✅ Completed: Notifications table, useNotifications hook, header integration with dropdown.
+5.  **Automations**: Configurable automation rules system.
+    *   ✅ Completed: Automation rules table, automation engine, Edge Function, 7 automation rules configured.
+6.  **Collaborative Chat**: Team chat system with channels and real-time messages.
+    *   ✅ Completed: Chat channels, messages, real-time updates, ChatView integrated.
+7.  **LLM Assistant**: AI-powered assistant for leads and projects.
+    *   ✅ Completed: OpenAI integration, useAssistant hook, AssistantDrawer component, integrated in LeadDetailView and ProjectDetailView.
+8.  **Signal-to-Noise Ratio**: Intelligent task prioritization system.
+    *   ✅ Completed: useSignalToNoiseForUser hook, SNR calculation, integrated in TodayView showing TOP 5 priorities.
+
+## Technical Stack
+*   **Frontend**: React 18, Vite, TypeScript, Tailwind CSS, React Router DOM.
+*   **Backend**: Supabase (PostgreSQL, Auth, Storage, Edge Functions, Realtime).
+*   **AI/LLM**: OpenAI API integration for assistant features.
+*   **Hosting**: Local development (Vite dev server on port 5174).
+
+## Current Status
+*   ✅ Repository cloned locally.
+*   ✅ Supabase connection established and fully integrated.
+*   ✅ All major features implemented and functional.
+*   ✅ AuthProvider fixed and integrated in App.tsx.
+*   ✅ Signal-to-Noise Ratio system implemented.
+*   ✅ Project name updated to "crm-nikufra" in package.json.
+
+## Key Features Implemented
+- Dashboard with real-time metrics
+- CRM & Sales (Leads, Contacts, Companies) with Kanban and detail pages
+- Projects & MVPs management
+- Documents with Supabase Storage integration
+- Calendar & Tasks with filtering
+- Performance & Analytics
+- Context and History system (activities, notes, timelines)
+- Notification system
+- Configurable automation rules
+- Collaborative chat
+- LLM Assistant (Nikufra Assistant)
+- Signal-to-Noise Ratio task prioritization
+- "Minha Agenda" view with personalized daily overview
