@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Users,
   TrendingUp,
@@ -21,6 +22,7 @@ import { callLLM } from '../../lib/llmClient';
 export default function DashboardView() {
   const { metrics, loading } = useDashboardMetrics();
   const { documents } = useDocuments();
+  const navigate = useNavigate();
 
   const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
   const [chatInput, setChatInput] = useState('');
@@ -193,7 +195,10 @@ Usa este contexto para responder em português com foco executivo.`;
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition">
+        <div
+          className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
+          onClick={() => navigate('/crm?tab=contacts')}
+        >
           <div className="flex items-start justify-between mb-4">
             <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
               <Users className="w-6 h-6 text-primary-700 dark:text-primary-500" />
@@ -207,7 +212,10 @@ Usa este contexto para responder em português com foco executivo.`;
           <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.totalContacts}</p>
         </div>
 
-        <div className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition">
+        <div
+          className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
+          onClick={() => navigate('/crm?tab=leads')}
+        >
           <div className="flex items-start justify-between mb-4">
             <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-primary-700 dark:text-primary-500" />
@@ -221,7 +229,10 @@ Usa este contexto para responder em português com foco executivo.`;
           <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.activeLeads}</p>
         </div>
 
-        <div className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition">
+        <div
+          className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
+          onClick={() => navigate('/projects')}
+        >
           <div className="flex items-start justify-between mb-4">
             <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
               <Briefcase className="w-6 h-6 text-primary-700 dark:text-primary-500" />
@@ -235,7 +246,10 @@ Usa este contexto para responder em português com foco executivo.`;
           <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.activeProjects}</p>
         </div>
 
-        <div className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition">
+        <div
+          className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
+          onClick={() => navigate('/calendar')}
+        >
           <div className="flex items-start justify-between mb-4">
             <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
               <CheckCircle className="w-6 h-6 text-primary-700 dark:text-primary-500" />
@@ -249,7 +263,10 @@ Usa este contexto para responder em português com foco executivo.`;
           <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.pendingTasks}</p>
         </div>
 
-        <div className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition">
+        <div
+          className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
+          onClick={() => navigate('/calendar')}
+        >
           <div className="flex items-start justify-between mb-4">
             <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
               <Calendar className="w-6 h-6 text-primary-700 dark:text-primary-500" />
@@ -263,7 +280,10 @@ Usa este contexto para responder em português com foco executivo.`;
           <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.upcomingEvents}</p>
         </div>
 
-        <div className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition">
+        <div
+          className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
+          onClick={() => navigate('/documents')}
+        >
           <div className="flex items-start justify-between mb-4">
             <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
               <FileText className="w-6 h-6 text-primary-700 dark:text-primary-500" />
@@ -277,7 +297,10 @@ Usa este contexto para responder em português com foco executivo.`;
         </div>
 
         {/* Risk Indicators */}
-        <div className="bg-white dark:bg-dark-900 rounded-xl border border-yellow-200 dark:border-yellow-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer">
+        <div
+          className="bg-white dark:bg-dark-900 rounded-xl border border-yellow-200 dark:border-yellow-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
+          onClick={() => navigate('/crm?tab=leads')}
+        >
           <div className="flex items-start justify-between mb-4">
             <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
               <AlertTriangle className="w-6 h-6 text-yellow-700 dark:text-yellow-500" />
@@ -295,7 +318,10 @@ Usa este contexto para responder em português com foco executivo.`;
           </p>
         </div>
 
-        <div className="bg-white dark:bg-dark-900 rounded-xl border border-orange-200 dark:border-orange-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer">
+        <div
+          className="bg-white dark:bg-dark-900 rounded-xl border border-orange-200 dark:border-orange-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
+          onClick={() => navigate('/projects')}
+        >
           <div className="flex items-start justify-between mb-4">
             <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
               <AlertTriangle className="w-6 h-6 text-orange-700 dark:text-orange-500" />

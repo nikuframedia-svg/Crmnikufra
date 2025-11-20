@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Plus, Users, Building2, TrendingUp, Upload } from 'lucide-react';
 import ContactsList from './ContactsList';
 import CompaniesList from './CompaniesList';
@@ -7,7 +8,19 @@ import LeadsKanban from './LeadsKanban';
 type Tab = 'contacts' | 'companies' | 'leads';
 
 export default function CRMView() {
-  const [activeTab, setActiveTab] = useState<Tab>('leads');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = (searchParams.get('tab') as Tab) || 'leads';
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab);
+
+  useEffect(() => {
+    const tab = (searchParams.get('tab') as Tab) || 'leads';
+    setActiveTab(tab);
+  }, [searchParams]);
+
+  const handleTabChange = (tab: Tab) => {
+    setActiveTab(tab);
+    setSearchParams({ tab });
+  };
 
   return (
     <div className="p-8">
@@ -28,7 +41,7 @@ export default function CRMView() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
         <div className="flex border-b border-gray-200">
           <button
-            onClick={() => setActiveTab('leads')}
+            onClick={() => handleTabChange('leads')}
             className={`flex items-center space-x-2 px-6 py-4 font-medium transition ${
               activeTab === 'leads'
                 ? 'text-blue-600 border-b-2 border-blue-600'
@@ -39,7 +52,7 @@ export default function CRMView() {
             <span>Leads</span>
           </button>
           <button
-            onClick={() => setActiveTab('contacts')}
+            onClick={() => handleTabChange('contacts')}
             className={`flex items-center space-x-2 px-6 py-4 font-medium transition ${
               activeTab === 'contacts'
                 ? 'text-blue-600 border-b-2 border-blue-600'
@@ -50,7 +63,7 @@ export default function CRMView() {
             <span>Contactos</span>
           </button>
           <button
-            onClick={() => setActiveTab('companies')}
+            onClick={() => handleTabChange('companies')}
             className={`flex items-center space-x-2 px-6 py-4 font-medium transition ${
               activeTab === 'companies'
                 ? 'text-blue-600 border-b-2 border-blue-600'
