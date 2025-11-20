@@ -195,153 +195,130 @@ Usa este contexto para responder em português com foco executivo.`;
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div
-          className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
-          onClick={() => navigate('/crm?tab=contacts')}
-        >
-          <div className="flex items-start justify-between mb-4">
-            <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
-              <Users className="w-6 h-6 text-primary-700 dark:text-primary-500" />
+        {[
+          {
+            label: 'Total Contactos',
+            value: metrics.totalContacts,
+            icon: Users,
+            trend: '12%',
+            trendDirection: 'up' as 'up' | 'down',
+            route: '/crm?tab=contacts',
+          },
+          {
+            label: 'Leads Ativos',
+            value: metrics.activeLeads,
+            icon: TrendingUp,
+            trend: '8%',
+            trendDirection: 'up' as 'up' | 'down',
+            route: '/crm?tab=leads',
+          },
+          {
+            label: 'Projetos Ativos',
+            value: metrics.activeProjects,
+            icon: Briefcase,
+            trend: '5%',
+            trendDirection: 'up' as 'up' | 'down',
+            route: '/projects',
+          },
+          {
+            label: 'Tarefas Pendentes',
+            value: metrics.pendingTasks,
+            icon: CheckCircle,
+            trend: '3%',
+            trendDirection: 'down' as 'up' | 'down',
+            route: '/today',
+          },
+          {
+            label: 'Próximos Eventos',
+            value: metrics.upcomingEvents,
+            icon: Calendar,
+            trend: '15%',
+            trendDirection: 'up' as 'up' | 'down',
+            route: '/calendar',
+          },
+          {
+            label: 'Documentos',
+            value: metrics.documentsCount,
+            icon: FileText,
+            trend: null,
+            trendDirection: 'up' as 'up' | 'down',
+            route: '/documents',
+          },
+        ].map((card) => (
+          <div
+            key={card.label}
+            className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
+            onClick={() => navigate(card.route)}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
+                <card.icon className="w-6 h-6 text-primary-700 dark:text-primary-500" />
+              </div>
+              {card.trend ? (
+                <span
+                  className={`flex items-center text-sm font-medium ${
+                    card.trendDirection === 'up'
+                      ? 'text-primary-600 dark:text-primary-500'
+                      : 'text-red-600 dark:text-red-500'
+                  }`}
+                >
+                  {card.trendDirection === 'up' ? (
+                    <ArrowUp className="w-4 h-4 mr-1" />
+                  ) : (
+                    <ArrowDown className="w-4 h-4 mr-1" />
+                  )}
+                  {card.trend}
+                </span>
+              ) : (
+                <span className="text-sm text-gray-400 dark:text-dark-400">-</span>
+              )}
             </div>
-            <span className="flex items-center text-sm text-primary-600 dark:text-primary-500 font-medium">
-              <ArrowUp className="w-4 h-4 mr-1" />
-              12%
-            </span>
+            <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">{card.label}</p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">{card.value}</p>
           </div>
-          <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">Total Contactos</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.totalContacts}</p>
-        </div>
+        ))}
 
-        <div
-          className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
-          onClick={() => navigate('/crm?tab=leads')}
-        >
-          <div className="flex items-start justify-between mb-4">
-            <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-primary-700 dark:text-primary-500" />
+        {[
+          {
+            label: 'Leads em Risco',
+            value: metrics.staleLeadsCount,
+            description: 'Sem atividade há mais de 7 dias',
+            route: '/crm?tab=leads',
+          },
+          {
+            label: 'Projetos em Risco',
+            value: metrics.staleProjectsCount,
+            description: 'Sem tarefas recentes há mais de 14 dias',
+            route: '/projects',
+          },
+        ].map((risk) => (
+          <div
+            key={risk.label}
+            className="bg-white dark:bg-dark-900 rounded-xl border border-yellow-200 dark:border-yellow-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
+            onClick={() => navigate(risk.route)}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
+                <AlertTriangle className="w-6 h-6 text-yellow-700 dark:text-yellow-500" />
+              </div>
+              {risk.value > 0 && (
+                <span className="flex items-center text-sm text-yellow-600 dark:text-yellow-500 font-medium">
+                  Atenção
+                </span>
+              )}
             </div>
-            <span className="flex items-center text-sm text-primary-600 dark:text-primary-500 font-medium">
-              <ArrowUp className="w-4 h-4 mr-1" />
-              8%
-            </span>
+            <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">{risk.label}</p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">{risk.value}</p>
+            <p className="text-xs text-gray-500 dark:text-dark-400 mt-1">{risk.description}</p>
           </div>
-          <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">Leads Ativos</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.activeLeads}</p>
-        </div>
-
-        <div
-          className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
-          onClick={() => navigate('/projects')}
-        >
-          <div className="flex items-start justify-between mb-4">
-            <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
-              <Briefcase className="w-6 h-6 text-primary-700 dark:text-primary-500" />
-            </div>
-            <span className="flex items-center text-sm text-primary-600 dark:text-primary-500 font-medium">
-              <ArrowUp className="w-4 h-4 mr-1" />
-              5%
-            </span>
-          </div>
-          <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">Projetos Ativos</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.activeProjects}</p>
-        </div>
-
-        <div
-          className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
-          onClick={() => navigate('/calendar')}
-        >
-          <div className="flex items-start justify-between mb-4">
-            <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-primary-700 dark:text-primary-500" />
-            </div>
-            <span className="flex items-center text-sm text-red-600 dark:text-red-500 font-medium">
-              <ArrowDown className="w-4 h-4 mr-1" />
-              3%
-            </span>
-          </div>
-          <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">Tarefas Pendentes</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.pendingTasks}</p>
-        </div>
-
-        <div
-          className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
-          onClick={() => navigate('/calendar')}
-        >
-          <div className="flex items-start justify-between mb-4">
-            <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
-              <Calendar className="w-6 h-6 text-primary-700 dark:text-primary-500" />
-            </div>
-            <span className="flex items-center text-sm text-primary-600 dark:text-primary-500 font-medium">
-              <ArrowUp className="w-4 h-4 mr-1" />
-              15%
-            </span>
-          </div>
-          <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">Próximos Eventos</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.upcomingEvents}</p>
-        </div>
-
-        <div
-          className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
-          onClick={() => navigate('/documents')}
-        >
-          <div className="flex items-start justify-between mb-4">
-            <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
-              <FileText className="w-6 h-6 text-primary-700 dark:text-primary-500" />
-            </div>
-            <span className="flex items-center text-sm text-gray-400 dark:text-dark-400">
-              -
-            </span>
-          </div>
-          <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">Documentos</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.documentsCount}</p>
-        </div>
-
-        {/* Risk Indicators */}
-        <div
-          className="bg-white dark:bg-dark-900 rounded-xl border border-yellow-200 dark:border-yellow-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
-          onClick={() => navigate('/crm?tab=leads')}
-        >
-          <div className="flex items-start justify-between mb-4">
-            <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
-              <AlertTriangle className="w-6 h-6 text-yellow-700 dark:text-yellow-500" />
-            </div>
-            {metrics.staleLeadsCount > 0 && (
-              <span className="flex items-center text-sm text-yellow-600 dark:text-yellow-500 font-medium">
-                Atenção
-              </span>
-            )}
-          </div>
-          <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">Leads em Risco</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.staleLeadsCount}</p>
-          <p className="text-xs text-gray-500 dark:text-dark-400 mt-1">
-            Sem atividade há mais de 7 dias
-          </p>
-        </div>
-
-        <div
-          className="bg-white dark:bg-dark-900 rounded-xl border border-orange-200 dark:border-orange-800 p-6 shadow-sm hover:shadow-md transition cursor-pointer"
-          onClick={() => navigate('/projects')}
-        >
-          <div className="flex items-start justify-between mb-4">
-            <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-              <AlertTriangle className="w-6 h-6 text-orange-700 dark:text-orange-500" />
-            </div>
-            {metrics.staleProjectsCount > 0 && (
-              <span className="flex items-center text-sm text-orange-600 dark:text-orange-500 font-medium">
-                Atenção
-              </span>
-            )}
-          </div>
-          <p className="text-sm text-gray-600 dark:text-dark-300 mb-1">Projetos em Risco</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{metrics.staleProjectsCount}</p>
-          <p className="text-xs text-gray-500 dark:text-dark-400 mt-1">
-            Sem tarefas recentes há mais de 14 dias
-          </p>
-        </div>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6">
+        <div
+          className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 cursor-pointer hover:shadow-md transition"
+          onClick={() => navigate('/crm')}
+        >
           <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Atividade Recente</h3>
           <div className="space-y-4">
             <div className="flex items-start space-x-4 pb-4 border-b border-gray-100 dark:border-dark-800">
@@ -355,7 +332,10 @@ Usa este contexto para responder em português com foco executivo.`;
           </div>
         </div>
 
-        <div className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6">
+        <div
+          className="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6 cursor-pointer hover:shadow-md transition"
+          onClick={() => navigate('/today')}
+        >
           <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Próximas Ações</h3>
           <div className="space-y-3">
             <div className="flex items-start space-x-3 p-3 bg-gray-50 dark:bg-dark-850 rounded-lg border border-gray-100 dark:border-dark-800">
