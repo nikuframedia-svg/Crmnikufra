@@ -7,10 +7,12 @@ const DEFAULT_SUPABASE_ANON_KEY =
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
+const isDevRuntime = typeof import.meta !== 'undefined' && import.meta.env?.DEV;
 
 if (
-  supabaseUrl === DEFAULT_SUPABASE_URL ||
-  supabaseAnonKey === DEFAULT_SUPABASE_ANON_KEY
+  isDevRuntime &&
+  (supabaseUrl === DEFAULT_SUPABASE_URL ||
+    supabaseAnonKey === DEFAULT_SUPABASE_ANON_KEY)
 ) {
   console.warn(
     '[Supabase] A utilizar credenciais padrão de desenvolvimento. Substitui estas variáveis no .env para usar outro projecto.'
